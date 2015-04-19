@@ -126,6 +126,16 @@ class ViewController: UIViewController {
         return missing
     }
     
+    @IBAction func shareMissingData() {
+        let textToShare = "Hello,\nOn behalf of the app programmers, please make sure that the following data gets reuploaded:\n\n" + display.text + "\nThank you very much!\n--The App Team\n"
+        let kittyPic:UIImage = UIImage(named: "kittyLime")!
+        let activityItems = [textToShare, kittyPic]
+        let activityViewController : UIActivityViewController = UIActivityViewController(
+            activityItems: activityItems, applicationActivities: nil)
+        self.presentViewController(activityViewController, animated: true, completion: nil)
+        
+    }
+    
     func displayMissingChangePackets(missing: [Match: [ChangePacket]]) {
         let toDisplay = NSMutableAttributedString()
         for match in matches {
