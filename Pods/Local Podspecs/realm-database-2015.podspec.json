@@ -1,0 +1,27 @@
+{
+  "name": "realm-database-2015",
+  "version": "0.0.1",
+  "summary": "The schema for the 2015 Realm database",
+  "description": "                   The schema for the 2015 Realm database\n\n                   * Think: Why did you write this? What is the focus? What does it do?\n                   * CocoaPods will be using this to generate tags, and improve search results.\n                   * Try to keep it short, snappy and to the point.\n                   * Finally, don't worry about the indent, CocoaPods strips it!\n",
+  "homepage": "https://github.com/frc1678/realm-database-2015",
+  "license": "MIT",
+  "authors": "Citrus Circuits",
+  "platforms": {
+    "ios": null
+  },
+  "source": {
+    "git": "https://github.com/frc1678/realm-database-2015",
+    "tag": "0.0.1"
+  },
+  "source_files": [
+    "iOS",
+    "iOS/**/*.{h,m}"
+  ],
+  "exclude_files": "iOS/Exclude",
+  "requires_arc": true,
+  "dependencies": {
+    "Realm": [
+
+    ]
+  }
+}

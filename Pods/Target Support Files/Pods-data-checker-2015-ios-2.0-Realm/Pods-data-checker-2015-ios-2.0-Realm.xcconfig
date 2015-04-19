@@ -1,0 +1,4 @@
+PODS_DATA_CHECKER______IOS_____REALM_CLANG_CXX_LANGUAGE_STANDARD = compiler-default
+PODS_DATA_CHECKER______IOS_____REALM_LIBRARY_SEARCH_PATHS = "$(PODS_ROOT)/Realm/core"
+PODS_DATA_CHECKER______IOS_____REALM_OTHER_CPLUSPLUSFLAGS = -std=c++1y $(inherited) -std=c++1y $(inherited)
+PODS_DATA_CHECKER______IOS_____REALM_OTHER_LDFLAGS = -l"c++" -l"realm-ios"
