@@ -8,13 +8,31 @@
 
 import UIKit
 
-let path = DBPath.root().childPath("Database File").childPath("pre_champs_testing.realm")
+let path = DBPath.root().childPath("Database File").childPath("realm.realm")
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var compDisplay: UILabel!
+    @IBOutlet weak var matchesDisplay: UILabel!
     @IBOutlet weak var display: UITextView!
-    var competition: Competition!
-    var matches: [Match]!
+    var competition: Competition? = nil {
+        didSet {
+            if let c = self.competition {
+                compDisplay.text = "Competition: \(c.name)"
+            } else {
+                compDisplay.text = "Competition: None"
+            }
+        }
+    }
+    var matches: [Match]? = nil {
+        didSet {
+            if let m = self.matches {
+                matchesDisplay.text = "Matches: \(m.count)"
+            } else {
+                matchesDisplay.text = "Matches: None"
+            }
+        }
+    }
     
     enum ChangePacket: Int {
         case redScout1 = 0
@@ -42,7 +60,12 @@ class ViewController: UIViewController {
     }
 
     @IBAction func missingChangePacketsTapped() {
-        displayMissingChangePackets(findMissingChangePackets())
+        findCompetition()
+        findPlayedMatches()
+        if let comp = competition,
+            let ms = matches {
+                displayMissingChangePackets(findMissingChangePackets())
+        }
     }
     
     func databaseUpdated(note: NSNotification) {
@@ -55,9 +78,10 @@ class ViewController: UIViewController {
         missingChangePacketsTapped()
     }
     
-    func findCompetition(realm: RLMRealm) -> Competition? {
-        competition = Competition.allObjectsInRealm(realm).firstObject() as? Competition
-        return competition
+    func findCompetition() {
+        CCRealmSync.defaultReadonlyDropboxRealm({ (realm: RLMRealm!) in
+            self.competition = Competition.allObjectsInRealm(realm).firstObject() as? Competition
+        })
     }
     
     func hasBeenPlayed(match: Match) -> Bool {
@@ -71,19 +95,21 @@ class ViewController: UIViewController {
         return match.officialRedScore != -1 || match.officialBlueScore != -1 || teamsHavePlayed
     }
     
-    func findPlayedMatches(realm: RLMRealm) -> AnyObject {
-        var playedMatches: [Match] = []
-        if let matches = competition.matches where matches.count > 0 {
-            for i in 0...(matches.count - 1) {
-                let match = matches[i] as! Match
-                if hasBeenPlayed(match) {
-                    playedMatches.append(match)
+    func findPlayedMatches() {
+        CCRealmSync.defaultReadonlyDropboxRealm({ (realm: RLMRealm!) in
+            var playedMatches: [Match] = []
+            if let c = self.competition,
+                let matches = c.matches where matches.count > 0 {
+                for i in 0...(matches.count - 1) {
+                    let match = matches[i] as! Match
+                    if self.hasBeenPlayed(match) {
+                        playedMatches.append(match)
+                    }
                 }
             }
-        }
-        
-        matches = playedMatches
-        return playedMatches
+            
+            self.matches = playedMatches
+        })
     }
     
     func missingChangePacketsInMatch(match: Match) -> [ChangePacket] {
@@ -116,11 +142,8 @@ class ViewController: UIViewController {
     
     func findMissingChangePackets() -> [Match: [ChangePacket]] {
         var missing = [Match: [ChangePacket]]()
-        if let competition = objectFromRealm(findCompetition) as? Competition,
-           let matches = objectFromRealm(findPlayedMatches) as? [Match] {
-            for match in matches {
-                missing[match] = missingChangePacketsInMatch(match)
-            }
+        for match in matches! {
+            missing[match] = missingChangePacketsInMatch(match)
         }
         
         return missing
@@ -138,7 +161,7 @@ class ViewController: UIViewController {
     
     func displayMissingChangePackets(missing: [Match: [ChangePacket]]) {
         let toDisplay = NSMutableAttributedString()
-        for match in matches {
+        for match in matches! {
             for missingPacket in missing[match]! {
                 toDisplay.appendAttributedString(changePacketToMissingMessage(missingPacket, match: match.0))
             }
@@ -180,13 +203,13 @@ class ViewController: UIViewController {
         }
     }
 
-    func objectFromRealm(function: (RLMRealm) -> AnyObject?) -> AnyObject? {
+    func objectFromRealm(function: (RLMRealm) -> AnyObject?) {
         var object: AnyObject? = nil
         CCRealmSync.defaultReadonlyDropboxRealm({ (realm: RLMRealm!) in
             object = function(realm)
+            
+            NSNotificationCenter.defaultCenter().postNotificationName("gotObject", object: object)
         })
-        
-        return object
     }
     
     func rlmArrayToArray(rlmArray: RLMArray) -> [RLMObject] {
