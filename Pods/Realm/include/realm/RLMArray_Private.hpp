@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.h"
-#import "RLMResults.h"
+#import <Realm/RLMResults.h>
 
 #import <memory>
 
@@ -71,7 +71,7 @@ namespace realm {
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<realm::Query>)query
-                                      view:(realm::TableView)view
+                                      view:(realm::TableView &&)view
                                      realm:(RLMRealm *)realm;
 - (void)deleteObjectsFromRealm;
 @end

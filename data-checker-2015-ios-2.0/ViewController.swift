@@ -88,10 +88,10 @@ class ViewController: UIViewController {
         var teamsHavePlayed = false
         for timData in (rlmArrayToArray(match.teamInMatchDatas) as! [TeamInMatchData]) {
             if timData.uploadedData.maxFieldToteHeight != -1 || timData.uploadedData.stackPlacing != -1 {
-                teamsHavePlayed == true
+                teamsHavePlayed = true
             }
         }
-        
+        //return teamsHavePlayed
         return match.officialRedScore != -1 || match.officialBlueScore != -1 || teamsHavePlayed
     }
     
@@ -214,8 +214,10 @@ class ViewController: UIViewController {
     
     func rlmArrayToArray(rlmArray: RLMArray) -> [RLMObject] {
         var a: [RLMObject] = []
-        for i in 0...(rlmArray.count - 1) {
-            a.append(rlmArray.objectAtIndex(i) as! RLMObject)
+        if rlmArray.count > 0 {
+            for i in 0...(rlmArray.count - 1) {
+                a.append(rlmArray.objectAtIndex(i) as! RLMObject)
+            }
         }
         
         return a
